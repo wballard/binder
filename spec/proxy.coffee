@@ -17,10 +17,13 @@ describe 'object proxy', ->
         before = []
         after = []
 
+    #these are cloning interceptors
     intercept_before = (object, property, value) ->
+        value = JSON.parse(JSON.stringify(value))
         before.push [property, value]
 
     intercept_after = (object, property, value) ->
+        value = JSON.parse(JSON.stringify(value))
         after.push [property, value]
 
     it 'changes an object into a proxy', ->
@@ -97,5 +100,23 @@ describe 'object proxy', ->
             ['b', '']
         ]
         expect(after).toEqual [
+            ['b', 1]
+        ]
+
+    it 'proxies objects as they are added to a proxied object', ->
+        x =
+            a: null
+
+        binder.proxyObject x, intercept_before, intercept_after
+        x.a = {b: ''}
+        expect(x.a).toEqual {b: ''}
+        expect(x.a).toBeProxied()
+        x.a.b = 1
+        expect(before).toEqual [
+            ['a', null],
+            ['b', '']
+        ]
+        expect(after).toEqual [
+            ['a', {b: ''}],
             ['b', 1]
         ]

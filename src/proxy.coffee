@@ -17,14 +17,21 @@ sets on data objects as returned via JSON.
 @returns {Object} this echoes the proxied object to allow chaining
 ###
 proxyObject = (object, before, after) ->
+    if not object
+        return null
+    if object?.__proxied__
+        return object
     #TODO
     #nested array values need to be proxied
-    #values themselves need to be proxied when added to an object
     #need a way to not double proxy
     #parent will be handy
     handler = (property, before_value, after_value) ->
+        #objects need to be proxied when added to an object
+        if typeof(after_value) == 'object'
+            proxyObject after_value, before, after
         before object, property, before_value
         after object, property, after_value
+        after_value
     for name, value of object
         #arrays need their mutation methods intercepted
         if Array.isArray value
@@ -36,11 +43,14 @@ proxyObject = (object, before, after) ->
                         ret = prior.apply value, arguments
                         after object, name, value.slice(0)
                         ret)()
-        #reckrsively proxy
+        #recursive proxy
         else if typeof(value) == 'object'
             value = proxyObject value, before, after
         #watch every property to call our function
         object.watch name, handler
+    Object.defineProperty object, '__proxied__', 
+        enumerable: false
+        value: true
     object
 
 module =

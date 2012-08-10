@@ -3,7 +3,7 @@ proxy provides the ability to wrap any object with a proxy wraps any
 property set.
 ###
 
-array_mutators = ['push']
+array_mutators = ['push', 'unshift', 'pop', 'shift']
 
 ###
 Given an object, 'mangle' it by replacing all properties with a caller
@@ -20,19 +20,22 @@ proxyObject = (object, before, after) ->
         before object, property, before_value
         after object, property, after_value
     for name, value of object
-        #recursively proxy
-        if typeof(value) == 'object'
-            value = proxyObject value, before, after
         #arrays need their mutation methods intercepted
         if Array.isArray value
             for mutator in array_mutators
-                prior = value[mutator]
-                value[mutator] = ->
-                    #this is a terrible clone, find a better way
-                    before object, name, value.map((x)-> x)
-                    prior.apply value, arguments
-                    after object, name, value.map((x)-> x)
-            console.log 'a'
+                console.log mutator
+                (->
+                    prior = value[mutator]
+                    value[mutator] = ->
+                        #this is a terrible clone, find a better way
+                        before object, name, value.map((x)-> x)
+                        ret = prior.apply value, arguments
+                        after object, name, value.map((x)-> x)
+                        console.log prior, value.map((x) -> x)
+                        ret)()
+        #reckrsively proxy
+        else if typeof(value) == 'object'
+            value = proxyObject value, before, after
         #watch every property to call our function
         object.watch name, handler
     object

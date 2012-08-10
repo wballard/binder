@@ -8,13 +8,18 @@ alone library...
 
 
 describe 'object proxy', ->
-    scratch = []
+    before = []
+    after = []
 
     beforeEach ->
-        scratch = []
+        before = []
+        after = []
 
-    intercept = (object, property, value) ->
-        scratch.push [object, property, value]
+    intercept_before = (object, property, value) ->
+        before.push [property, value]
+
+    intercept_after = (object, property, value) ->
+        after.push [property, value]
 
     it 'changes an object into a proxy', ->
         x =
@@ -26,26 +31,52 @@ describe 'object proxy', ->
         x =
             a: 1
             b: 2
-        binder.proxyObject x, intercept, intercept
+        binder.proxyObject x, intercept_before, intercept_after
         x.a = 11
         x.b = 22
-        expect(scratch).toEqual [
-            [x, 'a', 1],
-            [x, 'a', 11],
-            [x, 'b', 2],
-            [x, 'b', 22]
+        expect(before).toEqual [
+            ['a', 1],
+            ['b', 2]
+        ]
+        expect(after).toEqual [
+            ['a', 11],
+            ['b', 22]
         ]
 
     it 'proxies into an object with array properties', ->
         x = 
             a: []
-        binder.proxyObject x, intercept, intercept
+        binder.proxyObject x, intercept_before, intercept_after
+
         x.a.push 1
         x.a.push 2
-        compare_to = [
-            [x, 'a', []],
-            [x, 'a', [1]],
-            [x, 'a', [1]],
-            [x, 'a', [1,2]],
+        expect(after).toEqual [
+            ['a', [1]],
+            ['a', [1,2]]
         ]
-        expect(scratch).toEqual compare_to
+
+        x.a.unshift 0
+        expect(after).toEqual [
+            ['a', [1]],
+            ['a', [1,2]],
+            ['a', [0,1,2]]
+        ]
+
+        y = x.a.pop()
+        expect(y).toEqual 2
+        expect(after).toEqual [
+            ['a', [1]],
+            ['a', [1,2]],
+            ['a', [0,1,2]]
+            ['a', [0,1]]
+        ]
+
+        y = x.a.shift()
+        expect(y).toEqual 0
+        expect(after).toEqual [
+            ['a', [1]],
+            ['a', [1,2]],
+            ['a', [0,1,2]]
+            ['a', [0,1]]
+            ['a', [1]]
+        ]

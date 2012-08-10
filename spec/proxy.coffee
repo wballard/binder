@@ -120,3 +120,19 @@ describe 'object proxy', ->
             ['a', {b: ''}],
             ['b', 1]
         ]
+
+    it 'will not double proxy', ->
+        x =
+            a: null
+        binder.proxyObject x, intercept_before, intercept_after
+        binder.proxyObject x, intercept_before, intercept_after
+        expect(x.__proxied__).toEqual true
+        x.a = 1
+        expect(before).toEqual [
+            ['a', null],
+        ]
+        expect(after).toEqual [
+            ['a', 1]
+        ]
+
+

@@ -23,7 +23,6 @@ proxyObject = (object, before, after) ->
         return object
     #TODO
     #nested array values need to be proxied
-    #need a way to not double proxy
     #parent will be handy
     handler = (property, before_value, after_value) ->
         #objects need to be proxied when added to an object

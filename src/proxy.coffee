@@ -17,6 +17,11 @@ sets on data objects as returned via JSON.
 @returns {Object} this echoes the proxied object to allow chaining
 ###
 proxyObject = (object, before, after) ->
+    #TODO
+    #nested array values need to be proxied
+    #values themselves need to be proxied when added to an object
+    #need a way to not double proxy
+    #parent will be handy
     handler = (property, before_value, after_value) ->
         before object, property, before_value
         after object, property, after_value

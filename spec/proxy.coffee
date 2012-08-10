@@ -85,3 +85,17 @@ describe 'object proxy', ->
             ['a', ['a','b']],
         ]
 
+    it 'proxies nested objects properties', ->
+        x =
+            a:
+                b: ''
+
+        binder.proxyObject x, intercept_before, intercept_after
+
+        x.a.b = 1
+        expect(before).toEqual [
+            ['b', '']
+        ]
+        expect(after).toEqual [
+            ['b', 1]
+        ]

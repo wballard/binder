@@ -16,7 +16,7 @@ sets on data objects as returned via JSON.
 @param after {Function} proxy intercepts just after a write
 @returns {Object} this echoes the proxied object to allow chaining
 ###
-proxyObject = (object, before, after) ->
+proxyObject = (object, before, after, options) ->
     if not object
         return null
     if object?.__proxied__
@@ -27,7 +27,8 @@ proxyObject = (object, before, after) ->
     handler = (property, before_value, after_value) ->
         #objects need to be proxied when added to an object
         if typeof(after_value) == 'object'
-            proxyObject after_value, before, after
+            proxyObject after_value, before, after,
+                parent: object
         before object, property, before_value
         after object, property, after_value
         after_value
@@ -44,10 +45,11 @@ proxyObject = (object, before, after) ->
                         ret)()
         #recursive proxy
         else if typeof(value) == 'object'
-            value = proxyObject value, before, after
+            value = proxyObject value, before, after,
+                parent: object
         #watch every property to call our function
         object.watch name, handler
-    Object.defineProperty object, '__proxied__', 
+    Object.defineProperty object, '__proxied__',
         enumerable: false
         value: true
     object

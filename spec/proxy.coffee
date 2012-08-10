@@ -136,3 +136,5 @@ describe 'object proxy', ->
         ]
 
 
+
+

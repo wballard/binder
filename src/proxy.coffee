@@ -23,15 +23,12 @@ proxyObject = (object, before, after) ->
         #arrays need their mutation methods intercepted
         if Array.isArray value
             for mutator in array_mutators
-                console.log mutator
                 (->
                     prior = value[mutator]
                     value[mutator] = ->
-                        #this is a terrible clone, find a better way
-                        before object, name, value.map((x)-> x)
+                        before object, name, value.slice(0)
                         ret = prior.apply value, arguments
-                        after object, name, value.map((x)-> x)
-                        console.log prior, value.map((x) -> x)
+                        after object, name, value.slice(0)
                         ret)()
         #reckrsively proxy
         else if typeof(value) == 'object'

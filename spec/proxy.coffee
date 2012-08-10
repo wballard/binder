@@ -8,6 +8,8 @@ alone library...
 
 
 describe 'object proxy', ->
+
+    #this is sort of like a transaction log on property access
     before = []
     after = []
 
@@ -50,33 +52,23 @@ describe 'object proxy', ->
 
         x.a.push 1
         x.a.push 2
-        expect(after).toEqual [
+        x.a.unshift 0
+        expect(x.a.pop()).toEqual 2
+        expect(x.a.shift()).toEqual 0
+
+        #just check the operations before and after arrays at the end
+        expect(before).toEqual [
+            ['a', []],
             ['a', [1]],
             ['a', [1,2]]
-        ]
-
-        x.a.unshift 0
-        expect(after).toEqual [
-            ['a', [1]],
-            ['a', [1,2]],
             ['a', [0,1,2]]
+            ['a', [0,1]],
         ]
-
-        y = x.a.pop()
-        expect(y).toEqual 2
         expect(after).toEqual [
             ['a', [1]],
             ['a', [1,2]],
             ['a', [0,1,2]]
             ['a', [0,1]]
+            ['a', [1]],
         ]
 
-        y = x.a.shift()
-        expect(y).toEqual 0
-        expect(after).toEqual [
-            ['a', [1]],
-            ['a', [1,2]],
-            ['a', [0,1,2]]
-            ['a', [0,1]]
-            ['a', [1]]
-        ]

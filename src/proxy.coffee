@@ -3,7 +3,7 @@ proxy provides the ability to wrap any object with a proxy wraps any
 property set.
 ###
 
-array_mutators = ['push', 'unshift', 'pop', 'shift']
+array_mutators = ['push', 'unshift', 'pop', 'shift', 'reverse', 'sort']
 
 ###
 Given an object, 'mangle' it by replacing all properties with a caller

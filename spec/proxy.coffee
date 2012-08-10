@@ -58,6 +58,8 @@ describe 'object proxy', ->
         x.a.push 2
         expect(x.a.reverse()).toEqual [2,1]
         expect(x.a.sort()).toEqual [1,2]
+        expect(x.a.splice(0,2,'a','b')).toEqual [1,2]
+        expect(x.a).toEqual ['a','b']
 
         #just check the operations before and after arrays at the end
         expect(before).toEqual [
@@ -69,6 +71,7 @@ describe 'object proxy', ->
             ['a', [1]],
             ['a', [1,2]],
             ['a', [2,1]],
+            ['a', [1,2]],
         ]
         expect(after).toEqual [
             ['a', [1]],
@@ -79,5 +82,6 @@ describe 'object proxy', ->
             ['a', [1,2]],
             ['a', [2,1]],
             ['a', [1,2]],
+            ['a', ['a','b']],
         ]
 

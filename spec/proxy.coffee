@@ -163,5 +163,11 @@ describe 'object proxy', ->
         x.a.b = 2
         expect(parent).toBe x
 
+    it 'forgives you if you forget callbacks', ->
+        x =
+            a: 1
+        expect((-> binder.proxyObject x)).not.toThrow()
+        expect((-> x.a = 2)).not.toThrow()
+
 
 

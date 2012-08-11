@@ -9,3 +9,7 @@ describe 'declarative binding', ->
             a: 1
             b: 2
         $('#static > [data-attribute]').binder data
+        expect($('#static > [data-attribute="a"]').text())
+            .toEqual data.a.toString()
+        expect($('#static > [data-attribute="b"]').text())
+            .toEqual data.b.toString()

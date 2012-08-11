@@ -54,8 +54,11 @@ proxyObject = (object, before, after, options) ->
         value: true
     object
 
-module =
-    proxyObject:  proxyObject
-
-#make this AMD/node/window compatible
-window.binder = module
+#Export the proxy to the passed this or as a CommonJS module 
+#if that's available.
+root = this
+if module? and module?.exports
+    root = module.exports
+if not root?.binder
+    root.binder = {}
+root.binder.proxyObject = proxyObject

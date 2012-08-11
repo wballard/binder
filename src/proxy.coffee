@@ -4,6 +4,8 @@
 Provides the ability to wrap any object with a proxy that sets up interception
 callbacks on any property set or nested array mutation. This sets a foundation
 for aspect oriented style JavaScript.
+
+You can use this standalone, separate from the rest of binder.
 ###
 
 ###

@@ -13,3 +13,8 @@ describe 'declarative binding', ->
             .toEqual data.a.toString()
         expect($('#static > [data-attribute="b"]').text())
             .toEqual data.b.toString()
+
+        #and now change the javascript variable
+        data.b = 'zz'
+        expect($('#static > [data-attribute="b"]').text())
+            .toEqual 'zz'

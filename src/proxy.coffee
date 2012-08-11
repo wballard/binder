@@ -60,16 +60,13 @@ proxyObject = (object, before, after, options) ->
                 (->
                     prior = value[mutator]
                     value[mutator] = ->
-                        #this is taking a slice snapshot of the array
-                        #in order to facilitate testing, as the values will
-                        #be asserted after a series of mutations to the array
-                        before object, name, value.slice(0)
+                        before object, name, value
                         ret = prior.apply value, arguments
                         for argument in arguments
                             #parent is the array, not the containing object
                             proxyObject argument, before, after,
                                 parent: value
-                        after object, name, value.slice(0)
+                        after object, name, value
                         ret)()
         #recursive proxy
         value = proxyObject value, before, after,

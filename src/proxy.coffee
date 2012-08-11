@@ -19,11 +19,16 @@ sets on data objects as returned via JSON.
 proxyObject = (object, before, after, options) ->
     if not object
         return null
+    if typeof(object) != 'object'
+        return object
     if object?.__proxied__
         return object
     #TODO
-    #nested array values need to be proxied
     #parent will be handy
+
+    #Define a handler closure for this object being proxied
+    #to be used from watch. This is the interception point that
+    #connects the before and after callbacks.
     handler = (property, before_value, after_value) ->
         #objects need to be proxied when added to an object
         if typeof(after_value) == 'object'
@@ -32,6 +37,8 @@ proxyObject = (object, before, after, options) ->
         before object, property, before_value
         after object, property, after_value
         after_value
+
+    #every enumerable property will be proxied
     for name, value of object
         #arrays need their mutation methods intercepted
         if Array.isArray value
@@ -39,16 +46,25 @@ proxyObject = (object, before, after, options) ->
                 (->
                     prior = value[mutator]
                     value[mutator] = ->
+                        #this is taking a slice snapshot of the array
+                        #in order to facilitate testing, as the values will
+                        #be asserted after a series of mutations to the array
                         before object, name, value.slice(0)
                         ret = prior.apply value, arguments
+                        for argument in arguments
+                            #parent is the array, not the containing object
+                            proxyObject argument, before, after,
+                                parent: value
                         after object, name, value.slice(0)
                         ret)()
         #recursive proxy
-        else if typeof(value) == 'object'
-            value = proxyObject value, before, after,
-                parent: object
+        value = proxyObject value, before, after,
+            parent: object
         #watch every property to call our function
         object.watch name, handler
+
+    #create a guard so we can avoid double proxy, that isn't enumerable
+    #since we don't want it showing up in JSON
     Object.defineProperty object, '__proxied__',
         enumerable: false
         value: true

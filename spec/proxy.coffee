@@ -135,6 +135,22 @@ describe 'object proxy', ->
             ['a', 1]
         ]
 
+    it 'will proxy objects added to proxied arrays', ->
+        x =
+            a: []
+        binder.proxyObject x, intercept_before, intercept_after
 
+        x.a.push
+            b: 1
+        x.a[0].b = 2
+
+        expect(before).toEqual [
+            ['a', []],
+            ['b', 1],
+        ]
+        expect(after).toEqual [
+            ['a', [b: 1]],
+            ['b', 2]
+        ]
 
 

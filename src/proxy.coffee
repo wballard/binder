@@ -1,12 +1,21 @@
 ###
-proxy provides the ability to wrap any object with a proxy wraps any
-property set.
+@module proxy
+
+Provides the ability to wrap any object with a proxy that sets up interception
+callbacks on any property set or nested array mutation. This sets a foundation
+for aspect oriented style JavaScript.
 ###
 
+###
+@private
+List of methods on Array that mutate it in place.
+###
 array_mutators = ['push', 'unshift', 'pop',
     'shift', 'reverse', 'sort', 'splice']
 
 ###
+@function
+
 Given an object, 'mangle' it by replacing all properties with a caller
 transparent proxy. The intention is that this is used to intercept property
 sets on data objects as returned via JSON.
@@ -15,6 +24,10 @@ sets on data objects as returned via JSON.
 @param before {Function} proxy intercepts just before a write
 @param after {Function} proxy intercepts just after a write
 @returns {Object} this echoes the proxied object to allow chaining
+
+The before and after callbacks are of the form 
+(object, property, value, options)
+allowing you to have some context on where a named property changed.
 ###
 proxyObject = (object, before, after, options) ->
     if not object
@@ -23,8 +36,9 @@ proxyObject = (object, before, after, options) ->
         return object
     if object?.__proxied__
         return object
-    #TODO
-    #parent will be handy
+    before = before or (p, o, n, v) ->
+    after = after or (p, o, n, v) ->
+    options = options or {}
 
     #Define a handler closure for this object being proxied
     #to be used from watch. This is the interception point that
@@ -34,8 +48,8 @@ proxyObject = (object, before, after, options) ->
         if typeof(after_value) == 'object'
             proxyObject after_value, before, after,
                 parent: object
-        before object, property, before_value
-        after object, property, after_value
+        before object, property, before_value, options
+        after object, property, after_value, options
         after_value
 
     #every enumerable property will be proxied
@@ -70,7 +84,7 @@ proxyObject = (object, before, after, options) ->
         value: true
     object
 
-#Export the proxy to the passed this or as a CommonJS module 
+#Export the proxy to the passed this or as a CommonJS module
 #if that's available.
 root = this
 if module? and module?.exports

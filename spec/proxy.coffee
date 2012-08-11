@@ -18,11 +18,11 @@ describe 'object proxy', ->
         after = []
 
     #these are cloning interceptors
-    intercept_before = (object, property, value) ->
+    intercept_before = (object, property, value, options) ->
         value = JSON.parse(JSON.stringify(value))
         before.push [property, value]
 
-    intercept_after = (object, property, value) ->
+    intercept_after = (object, property, value, options) ->
         value = JSON.parse(JSON.stringify(value))
         after.push [property, value]
 
@@ -152,5 +152,16 @@ describe 'object proxy', ->
             ['a', [b: 1]],
             ['b', 2]
         ]
+
+    it 'gives you the parent', ->
+        x =
+            a:
+                b: 1
+        parent = null
+        binder.proxyObject x, (_, __, ___, options) ->
+            parent = options.parent
+        x.a.b = 2
+        expect(parent).toBe x
+
 
 

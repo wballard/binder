@@ -39,7 +39,7 @@ describe 'declarative binding', ->
             .toEqual 'zz'
 
     it 'should update bound static elements from bound input elements', ->
-        data = 
+        data =
             a: 1
             b: 2
         $('#dynamic').binder data
@@ -55,3 +55,16 @@ describe 'declarative binding', ->
             .toEqual data.a.toString()
         expect($('#static > [data-attribute="b"]').text())
             .toEqual data.b.toString()
+
+    it 'should bind in real time', ->
+        data =
+            a: 1
+            b: 2
+        $('#dynamic').binder data
+        $('#static').binder data
+        #force fire the change
+        $('#dynamic > [data-attribute="a"]').val('q').trigger 'keyup'
+        $('#dynamic > [data-attribute="b"]').val('r').trigger 'keyup'
+        #from the form down to the data object
+        expect(data.a).toEqual 'q'
+        expect(data.b).toEqual 'r'

@@ -50,7 +50,8 @@ databind = ($, object, element) ->
                 #input elements bind into value
                 setWith = 'val'
                 target.on 'change', (evt) ->
-                    console.log 'change'
+                    object[property] = target.val()
+                target.on 'keyup', (evt) ->
                     object[property] = target.val()
             else
                 #otherwise we just replace the body text

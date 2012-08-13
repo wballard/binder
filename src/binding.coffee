@@ -49,9 +49,14 @@ databind = ($, object, element) ->
             if target.is 'input'
                 #input elements bind into value
                 setWith = 'val'
+                target.on 'change', (evt) ->
+                    console.log 'change'
+                    object[property] = target.val()
             else
                 #otherwise we just replace the body text
                 setWith = 'text'
+            #common behavior, set the initial value and update the presentation
+            #value on events coming off of the data object
             target[setWith] object[property]
             $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
                 if target.data('data-attribute') is object

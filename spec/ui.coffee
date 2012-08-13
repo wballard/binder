@@ -37,3 +37,21 @@ describe 'declarative binding', ->
         data.b = 'zz'
         expect($('#dynamic > [data-attribute="b"]').val())
             .toEqual 'zz'
+
+    it 'should update bound static elements from bound input elements', ->
+        data = 
+            a: 1
+            b: 2
+        $('#dynamic').binder data
+        $('#static').binder data
+        #force fire the change
+        $('#dynamic > [data-attribute="a"]').val('q').trigger 'change'
+        $('#dynamic > [data-attribute="b"]').val('r').trigger 'change'
+        #from the form down to the data object
+        expect(data.a).toEqual 'q'
+        expect(data.b).toEqual 'r'
+        #and across to the UI element
+        expect($('#static > [data-attribute="a"]').text())
+            .toEqual data.a.toString()
+        expect($('#static > [data-attribute="b"]').text())
+            .toEqual data.b.toString()

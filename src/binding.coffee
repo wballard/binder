@@ -77,7 +77,7 @@ databind = ($, object, element) ->
                 #input elements bind into value
                 setWith = 'val'
                 #input elements can change
-                target.on 'change.binder keyup.binder mouseup.binder', (evt) ->
+                target.on 'change.binder keyup.binder keydown.binder mouseup.binder', (evt) ->
                     object[property] = target.val()
             else
                 #otherwise we just replace the body text

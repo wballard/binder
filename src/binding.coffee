@@ -120,6 +120,8 @@ $.fn.extend
         self = $.fn.binder
         @each (i, el) ->
             if data
+                #double binding would be trouble
+                unbind $, el
                 databind $, data, el
             else
                 unbind $, el

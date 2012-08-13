@@ -69,10 +69,10 @@ databind = ($, object, element) ->
     $('[data-attribute]', $(element)).each (i, bindable) ->
         ( ->
             target = $(bindable)
-            property = target.attr 'data-attribute'
+            property = target.data 'attribute'
             #hold on to the source object as data, this is useful to know
             #which which object's attributes are being tracked
-            target.data 'data-attribute', object
+            target.data 'boundto.binder', object
             if target.is 'input'
                 #input elements bind into value
                 setWith = 'val'
@@ -87,7 +87,7 @@ databind = ($, object, element) ->
                 #data events are coming off by name, so look at the object
                 #as a bit of a double check to make sure we are getting the
                 #property for the correct object in case of name overloads
-                if target.data('data-attribute') is object
+                if target.data('boundto.binder') is object
                     target[setWith] value
             #initial set of the value
             target[setWith] object[property]
@@ -106,8 +106,9 @@ Given a DOM element, remove any data binding.
 unbind = ($, element) ->
     $('[data-attribute]', $(element)).each (i, bindable) ->
         target = $(bindable)
-        property = target.attr 'data-attribute'
+        property = target.data 'attribute'
         target.off '.binder'
+        target.data 'boundto.binder', null
         event_hub.unsubscribe target, property
     element
 

@@ -14,8 +14,32 @@ Ignore event handler, avoids making functions for each property
 ###
 ignore = ->
 
+###
+@private
 
-event_hub = {}
+This sets up a relay point to allow subscribe/unsubscribe functionality
+so that we can unhook data binding without unhooking other folks event
+handlers.
+
+###
+event_hub =
+    properties: {}
+    subscribe: (target, property, action) ->
+        targets = @properties[property] or []
+        if targets.length is 0
+            #hook up the event relay when we get our very first one
+            $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
+                for [target, action] in @properties[property]
+                    action object, value
+        #subscription handler
+        targets.push [target, action]
+        @properties[property] = targets
+    unsubscribe: (target, property) ->
+        targets = @properties[property] or []
+        targets = targets.filter ([boundtarget, action]) ->
+            not(boundtarget.is target)
+        @properties[property] = targets
+
 ###
 @function
 
@@ -39,7 +63,7 @@ databind = ($, object, element) ->
             $(event_hub).trigger "data-attribute-#{property}", [object, value]
 
     #grab at any bindable under this element
-    $('[data-attribute]', element).each (i, bindable) ->
+    $('[data-attribute]', $(element)).each (i, bindable) ->
         ( ->
             target = $(bindable)
             property = target.attr 'data-attribute'
@@ -49,20 +73,39 @@ databind = ($, object, element) ->
             if target.is 'input'
                 #input elements bind into value
                 setWith = 'val'
-                target.on 'change', (evt) ->
-                    object[property] = target.val()
-                target.on 'keyup', (evt) ->
+                #input elements can change
+                target.on 'change.binder keyup.binder mouseup.binder', (evt) ->
                     object[property] = target.val()
             else
                 #otherwise we just replace the body text
                 setWith = 'text'
-            #common behavior, set the initial value and update the presentation
-            #value on events coming off of the data object
-            target[setWith] object[property]
-            $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
+            #this is the event subscription relay into the event hub
+            event_hub.subscribe target, property, (object, value) ->
+                #data events are coming off by name, so look at the object
+                #as a bit of a double check to make sure we are getting the
+                #property for the correct object in case of name overloads
                 if target.data('data-attribute') is object
                     target[setWith] value
+            #initial set of the value
+            target[setWith] object[property]
         )()
+    element
+
+###
+@function
+
+Given a DOM element, remove any data binding.
+
+@param $ {Object} jQuery reference
+@param element {Object} DOM element root that was previously bound
+@returns this echoes back element to allow chaining
+###
+unbind = ($, element) ->
+    $('[data-attribute]', $(element)).each (i, bindable) ->
+        target = $(bindable)
+        property = target.attr 'data-attribute'
+        target.off '.binder'
+        event_hub.unsubscribe target, property
     element
 
 $ = jQuery
@@ -73,6 +116,9 @@ $.fn.extend
     binder: (data) ->
         self = $.fn.binder
         @each (i, el) ->
-            databind $, data, el
+            if data
+                databind $, data, el
+            else
+                unbind $, el
 
 

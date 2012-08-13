@@ -68,3 +68,30 @@ describe 'declarative binding', ->
         #from the form down to the data object
         expect(data.a).toEqual 'q'
         expect(data.b).toEqual 'r'
+
+    it 'should let you unbind', ->
+        data =
+            a: 1
+            b: 2
+        $('#dynamic').binder data
+        $('#static').binder data
+        data.a = 'zz'
+        expect($('#static > [data-attribute="a"]').text())
+            .toEqual data.a.toString()
+        expect($('#dynamic > [data-attribute="a"]').val())
+            .toEqual data.a.toString()
+        #here is the unbind protocol, bind to null
+        $('#dynamic').binder null
+        $('#static').binder null
+        data.a = 'yy'
+        expect($('#static > [data-attribute="a"]').text())
+            .toEqual 'zz'
+        expect($('#dynamic > [data-attribute="a"]').val())
+            .toEqual 'zz'
+        $('#dynamic > [data-attribute="a"]').val('xx').trigger 'change'
+        #this one is zz -- the last value, no binding
+        expect($('#static > [data-attribute="a"]').text())
+            .toEqual 'zz'
+        #this one is xx -- we updated it explicitly in the input
+        expect($('#dynamic > [data-attribute="a"]').val())
+            .toEqual 'xx'

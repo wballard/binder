@@ -21,24 +21,27 @@ This sets up a relay point to allow subscribe/unsubscribe functionality
 so that we can unhook data binding without unhooking other folks event
 handlers.
 
+This makes an event tunnel system to go 'down' rather than the normal bubble
+system, as the bindings cut across the DOM.
+
 ###
 event_hub =
+
     properties: {}
-    subscribe: (target, property, action) ->
-        targets = @properties[property] or []
-        if targets.length is 0
+
+    subscribe: (target, property) ->
+        @properties[property] = @properties[property] or []
+        if @properties[property].length is 0
             #hook up the event relay when we get our very first one
             $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
-                for [target, action] in @properties[property]
-                    action object, value
-        #subscription handler
-        targets.push [target, action]
-        @properties[property] = targets
+                for relay in @properties[property]
+                    relay.trigger "data-attribute-#{property}.binder",
+                        [object, value]
+        @properties[property].push target
+
     unsubscribe: (target, property) ->
-        targets = @properties[property] or []
-        targets = targets.filter ([boundtarget, action]) ->
-            not(boundtarget.is target)
-        @properties[property] = targets
+        @properties[property] = (@properties[property] or []).filter (x) ->
+            not(x.is target)
 
 ###
 @function
@@ -79,8 +82,8 @@ databind = ($, object, element) ->
             else
                 #otherwise we just replace the body text
                 setWith = 'text'
-            #this is the event subscription relay into the event hub
-            event_hub.subscribe target, property, (object, value) ->
+            event_hub.subscribe target, property
+            target.on "data-attribute-#{property}.binder", (evt, object, value) ->
                 #data events are coming off by name, so look at the object
                 #as a bit of a double check to make sure we are getting the
                 #property for the correct object in case of name overloads

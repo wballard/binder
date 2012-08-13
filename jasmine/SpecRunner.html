@@ -1,35 +1,39 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-  <head>
-    <title>Jasmine Spec Runner</title>
+    <head>
+        <title>Jasmine Spec Runner</title>
 
-    <link rel="shortcut icon" type="image/png" href="lib/jasmine-1.2.0/jasmine_favicon.png">
-    <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0/jasmine.css">
-    <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
-    <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
-    <script type="text/javascript" src="../lib/coffee-script.js"></script>
-    <script type="text/javascript" src="../lib/jquery-1.8.0.min.js"></script>
-
-
-    <script type="text/javascript" src="../src/watch.js"></script>
-    <script type="text/coffeescript" src="../src/proxy.coffee"></script>
-    <script type="text/coffeescript" src="../src/binding.coffee"></script>
-    <script type="text/coffeescript" src="../spec/proxy.coffee"></script>
-    <script type="text/coffeescript" src="../spec/ui.coffee"></script>
-    <script type="text/coffeescript" src="../spec/helper.coffee"></script>
+        <link rel="shortcut icon" type="image/png" href="lib/jasmine-1.2.0/jasmine_favicon.png">
+        <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0/jasmine.css">
+        <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
+        <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
+        <script type="text/javascript" src="../lib/coffee-script.js"></script>
+        <script type="text/javascript" src="../lib/jquery-1.8.0.min.js"></script>
 
 
-    <!-- run -->
-    <script type="text/coffeescript" src="specrunner.coffee"></script>
+        <script type="text/javascript" src="../src/watch.js"></script>
+        <script type="text/coffeescript" src="../src/proxy.coffee"></script>
+        <script type="text/coffeescript" src="../src/binding.coffee"></script>
+        <script type="text/coffeescript" src="../spec/proxy.coffee"></script>
+        <script type="text/coffeescript" src="../spec/ui.coffee"></script>
+        <script type="text/coffeescript" src="../spec/helper.coffee"></script>
 
-  </head>
 
-  <body>
-    <div id='static'>
-      <h1>UI Binding Targets</h1>
-      <h2 data-attribute='a'></h2>
-      <h3 data-attribute='b'></h3>
-    </div>
-  </body>
+        <!-- run -->
+        <script type="text/coffeescript" src="specrunner.coffee"></script>
+
+    </head>
+
+    <body>
+        <div id='static'>
+            <h1>UI Binding Targets</h1>
+            <h2 data-attribute='a'></h2>
+            <h3 data-attribute='b'></h3>
+        </div>
+        <form id='dynamic' action=''>
+            <input type='text' data-attribute='a'>
+            <input type='text' data-attribute='b'>
+        </form>
+    </body>
 </html>

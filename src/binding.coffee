@@ -32,29 +32,32 @@ of the target JavaScript object.
 databind = ($, object, element) ->
 
     #hook up a proxy to the object that translates the callback to
-    #a jQuery event
+    #a jQuery event, proxyObject will only proxy just once, so this will
+    #set up events for any subsequente bindings to the same data
     binder.proxyObject object, ignore,
         (object, property, value, options) ->
             $(event_hub).trigger "data-attribute-#{property}", [object, value]
 
-
-
-    target = $(element)
-    if target.is 'input'
-        #input elements work a bit differently
-        console.log element
-    else
-        #otherwise we just replace the body
-        property = target.attr 'data-attribute'
-        target.text object[property]
-        #hold on to the source object as data, this is useful to know
-        #which which object's attributes are being tracked
-        target.data 'data-attribute', object
-        $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
-            console.log arguments
-            if target.data('data-attribute') is object
-                console.log value
-                target.text value
+    #grab at any bindable under this element
+    $('[data-attribute]', element).each (i, bindable) ->
+        ( ->
+            target = $(bindable)
+            property = target.attr 'data-attribute'
+            #hold on to the source object as data, this is useful to know
+            #which which object's attributes are being tracked
+            target.data 'data-attribute', object
+            if target.is 'input'
+                #input elements bind into value
+                setWith = 'val'
+            else
+                #otherwise we just replace the body text
+                setWith = 'text'
+            target[setWith] object[property]
+            $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
+                if target.data('data-attribute') is object
+                    target[setWith] value
+        )()
+    element
 
 $ = jQuery
 ###

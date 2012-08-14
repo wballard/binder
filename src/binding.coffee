@@ -30,9 +30,9 @@ event_hub =
         @properties[property] = @properties[property] or []
         if @properties[property].length is 0
             #hook up the event relay when we get our very first one
-            $(event_hub).on "data-attribute-#{property}", (evt, object, value) ->
+            $(event_hub).on "data-bind-#{property}", (evt, object, value) ->
                 for relay in @properties[property]
-                    relay.trigger "data-attribute-#{property}.binder",
+                    relay.trigger "data-bind-#{property}.binder",
                         [object, value]
         @properties[property].push target
 
@@ -45,7 +45,7 @@ event_hub =
 
 Given an object and a DOM element, bind them together.
 
-Elements are marked with data-attribute='name', where name is property
+Elements are marked with data-bind='name', where name is property
 of the target JavaScript object.
 
 @param $ {Object} jQuery reference
@@ -60,13 +60,13 @@ databind = ($, object, element) ->
     #set up events for any subsequente bindings to the same data
     binder.proxyObject object, ignore,
         (object, property, value, options) ->
-            $(event_hub).trigger "data-attribute-#{property}", [object, value]
+            $(event_hub).trigger "data-bind-#{property}", [object, value]
 
     #grab at any bindable under this element
-    $('[data-attribute]', $(element)).each (i, bindable) ->
+    $('[data-bind]', $(element)).each (i, bindable) ->
         ( ->
             target = $(bindable)
-            property = target.data 'attribute'
+            property = target.data 'bind'
             #hold on to the source object as data, this is useful to know
             #which which object's attributes are being tracked
             target.data 'boundto.binder', object
@@ -80,7 +80,7 @@ databind = ($, object, element) ->
                 #otherwise we just replace the body text
                 setWith = 'text'
             event_hub.subscribe target, property
-            target.on "data-attribute-#{property}.binder", (evt, object, value) ->
+            target.on "data-bind-#{property}.binder", (evt, object, value) ->
                 #data events are coming off by name, so look at the object
                 #as a bit of a double check to make sure we are getting the
                 #property for the correct object in case of name overloads
@@ -105,9 +105,9 @@ Given a DOM element, remove any data binding.
 @returns this echoes back element to allow chaining
 ###
 unbind = ($, element) ->
-    $('[data-attribute]', $(element)).each (i, bindable) ->
+    $('[data-bind]', $(element)).each (i, bindable) ->
         target = $(bindable)
-        property = target.data 'attribute'
+        property = target.data 'bind'
         target.off '.binder'
         target.data 'boundto.binder', null
         event_hub.unsubscribe target, property

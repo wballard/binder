@@ -2,6 +2,7 @@
 require 'coffee-script'
 require 'fileutils'
 require 'uglifier'
+require 'listen'
 
 task :default => ['binder.min.js']
 
@@ -33,3 +34,14 @@ file 'binder.min.js' => COFFEE_DEST + JAVASCRIPT_DEST do |t|
   File.write t.name, Uglifier.compile(source)
 end
 
+task :clean do
+  File.delete 'binder.min.js'
+  FileUtils.rmdir 'build'
+end
+
+task :watch do
+  Listen.to 'src' do
+    puts 'compiling'
+    system 'rake'
+  end
+end

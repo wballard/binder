@@ -5,14 +5,8 @@
         <title>Basic Data Binding</title>
 
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-        <script type="text/javascript" src="../lib/coffee-script.js"></script>
         <script type="text/javascript" src="../lib/jquery-1.8.0.min.js"></script>
-
-
-        <script type="text/javascript" src="../src/watch.js"></script>
-        <script type="text/coffeescript" src="../src/proxy.coffee"></script>
-        <script type="text/coffeescript" src="../src/binding.coffee"></script>
-
+        <script type="text/javascript" src="../binder.min.js"></script>
     </head>
 
     <body>
@@ -25,22 +19,24 @@
         <div class='container'>
             <form id='dynamic' action=''>
                 <p>Type here...</p>
-                <input type='text' data-attribute='a'>
-                <input type='text' data-attribute='b'>
+                <input type='text' data-bind='a'>
+                <input type='text' data-bind='b'>
             </form>
             <div id='static'>
                 <p>And watch these change...</p>
-                <h2 data-attribute='a'></h2>
-                <h3 data-attribute='b'></h3>
+                <h2 data-bind='a'></h2>
+                <h3 data-bind='b'></h3>
             </div>
         </div>
-        <script type="text/coffeescript">
-            $ ->
-                data =
-                    a: 'Go ahead...'
+        <script type="text/javascript">
+            $( function () {
+                data = {
+                    a: 'Go ahead...',
                     b: 'Type something!'
-                $('#dynamic').binder data
-                $('#static').binder data
+                    }
+                $('#dynamic').binder(data)
+                $('#static').binder(data)
+            });
         </script>
     </body>
 </html>

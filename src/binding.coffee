@@ -1,14 +1,12 @@
 ###
 @module binding
+@requires jQuery
 
 Provides declarative data binding from JavaScript objects to DOM elements.
-
-
-@requires jQuery
 ###
 
 ###
-@function
+@private
 
 Ignore event handler, avoids making functions for each property
 ###
@@ -21,8 +19,7 @@ This sets up a relay point to allow subscribe/unsubscribe functionality
 so that we can unhook data binding without unhooking other folks event
 handlers.
 
-This makes an event tunnel system to go 'down' rather than the normal bubble
-system, as the bindings cut across the DOM.
+This is a pub/sub setup rather than an event bubbling setup.
 
 ###
 event_hub =
@@ -89,6 +86,10 @@ databind = ($, object, element) ->
                 #property for the correct object in case of name overloads
                 if target.data('boundto.binder') is object
                     target[setWith] value
+                    #and to be very jQuery link, fire an event to that any
+                    #library user can override as they see fit in code
+                    target.trigger 'datachange', [target[0], object, property, value]
+
             #initial set of the value
             target[setWith] object[property]
         )()

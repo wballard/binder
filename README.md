@@ -1,17 +1,18 @@
 # Binder #
 Binder is a jQuery plugin that allows you to keep your JavaScript
 objects and DOM elements in synch without any fuss, base class, or
-framework.
+framework. Plain DOM, JavaScript objects, and jQuery working together.
 
-Binding should be two way, from and given JavaScript object to any given
+Binding should be two way, from any given JavaScript object to any given
 DOM element, and back again from user input DOM elements. Further
 clarifying this, some available binding libraries are two way, but not
-reactive -- specifically once you render if you update the JavaScript
-object in code rendering is not repeated. Updates to either the
+reactive -- specifically once you render, if you update the JavaScript
+object in code rendering is not repeated. Other libraries trap events on
+DOM elements and can update your JavaScript object. Updates to either the
 JavaScript object that is the binding context or the DOM element that is
 the presentation should be reflected. Let's call this *omnidirectional*.
 
-Using binder you take just plain jQuery and just plain JavaScript
+With binder you take just plain jQuery and just plain JavaScript
 variables, no need for a framework or to restructure your application to
 take advantage of binder.
 
@@ -19,6 +20,10 @@ take advantage of binder.
 Binder works by creating a transparent proxy around your data objects,
 the idea being you can load up data from any JavaScript object and make
 it work as a binding context, without any base classes or frameworkery.
+
+This proxy intercepts property sets and array mutations. Read through
+it, you may want to use it to do some JavaScript aspect-oriented
+programming.
 
 ## Declarative Binding ##
 The most basic case is binding properties of some JavaScript object to a
@@ -63,6 +68,20 @@ And unbinding is just:
 
 The proxies and event handlers that make this work are hooked up for you
 automatically.
+
+## Events ##
+In order to make this feel a lot like jQuery, binder creates a few new
+events so that you can intercept and work with data binding just like
+any other event off the DOM.
+
+### datachange ###
+This is fired on each DOM element hooked up with binder when the
+underlying bound object property changes. You make a callback that looks
+like:
+
+~~~
+function (event, element, object, property, value) {...}
+~~~
 
 ## Declarative Formatting ##
 **TODO**

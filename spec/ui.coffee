@@ -95,3 +95,33 @@ describe 'declarative binding', ->
         #this one is xx -- we updated it explicitly in the input
         expect($('#dynamic > [data-attribute="a"]').val())
             .toEqual 'xx'
+
+    it 'should fire events', ->
+        data =
+            a: 1
+            b: 2
+        hub =
+            for_a: ->
+            for_static: ->
+        spyOn hub, 'for_a'
+        spyOn hub, 'for_static'
+        $('#static').binder data
+
+        $('#static > [data-attribute="a"]').on 'datachange', hub.for_a
+        $('#static').on 'datachange', hub.for_static
+
+        data.a = 11
+
+        expect(hub.for_a).toHaveBeenCalled()
+        expect(hub.for_a).toHaveBeenCalledWith jasmine.any(Object),
+            $('#static > [data-attribute="a"]')[0],
+            data,
+            'a',
+            11
+        #and the bubble
+        expect(hub.for_static).toHaveBeenCalled()
+        expect(hub.for_static).toHaveBeenCalledWith jasmine.any(Object),
+            $('#static > [data-attribute="a"]')[0],
+            data,
+            'a',
+            11

@@ -3,6 +3,25 @@ Test our ability to do bindings against the user interface.
 ###
 
 describe 'declarative binding', ->
+    beforeEach ->
+        snip = """
+        <div id='test_form' class='container'>
+            <form id='dynamic' action=''>
+                <p>Type here...</p>
+                <input type='text' data-bind='a'>
+                <input type='text' data-bind='b'>
+            </form>
+            <div id='static'>
+                <p>And watch these change...</p>
+                <h2 data-bind='a'></h2>
+                <h3 data-bind='b'></h3>
+            </div>
+        </div>
+        """
+        $('body').append(snip)
+
+    afterEach ->
+        $('#test_form').remove()
 
     it 'should bind data to static content elements', ->
         data =
@@ -125,3 +144,4 @@ describe 'declarative binding', ->
             data,
             'a',
             11
+

@@ -2,6 +2,7 @@
 require 'coffee-script'
 require 'fileutils'
 require 'uglifier'
+require 'jasmine-headless-webkit'
 require 'listen'
 
 COFFEE_SRC = FileList['src/*.coffee']
@@ -36,18 +37,24 @@ file DEST => COFFEE_DEST + JAVASCRIPT_DEST do |t|
   File.write t.name, Uglifier.compile(source)
 end
 
+Jasmine::Headless::Task.new('jasmine_headless') do |t|
+    t.colors = true
+    t.jasmine_config = 'jasmine.yaml'
+end
+
 task :clean do
   File.delete DEST
   FileUtils.rmdir 'build'
 end
 
+task :test => [DEST, :jasmine_headless] do |to|
+
+end
+
 task :watch do
   Listen.to 'src' do
     puts 'compiling'
-    system 'rake'
+    system 'rake test'
   end
 end
 
-task :test => DEST do
-    system 'ichabod --jasmine SpecRunner.html'
-end

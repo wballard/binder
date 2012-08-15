@@ -1,6 +1,9 @@
 source 'http://rubygems.org'
 
+gem 'therubyracer'
 gem 'coffee-script'
 gem 'uglifier'
 gem 'listen'
-gem 'ichabod'
+gem 'jasmine'
+gem 'jasmine-headless-webkit'
+

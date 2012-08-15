@@ -35,8 +35,8 @@ the best place to put the bindings.
 ~~~
     <div id='static'>
         <h1>UI Binding Targets</h1>
-        <h2 data-attribute='a'></h2>
-        <h3 data-attribute='b'></h3>
+        <h2 data-bind='a'></h2>
+        <h3 data-bind='b'></h3>
     </div>
 ~~~
 
@@ -45,8 +45,8 @@ that the binding is two way.
 
 ~~~
     <form id='dynamic' action=''>
-        <input type='text' data-attribute='a'>
-        <input type='text' data-attribute='b'>
+        <input type='text' data-bind='a'>
+        <input type='text' data-bind='b'>
     </form>
 ~~~
 
@@ -57,7 +57,7 @@ And actually connecting the thing is just:
         a: 'Hello',
         b: 'World
     }
-    $('#dynamic').binder data
+    $('#dynamic').binder(data)
 ~~~
 
 And unbinding is just:

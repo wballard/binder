@@ -4,13 +4,15 @@ require 'fileutils'
 require 'uglifier'
 require 'listen'
 
-task :default => ['binder.min.js']
-
-directory "build"
 COFFEE_SRC = FileList['src/*.coffee']
 COFFEE_DEST = COFFEE_SRC.pathmap "build/%n.js"
 JAVASCRIPT_SRC = FileList['src/*.js']
 JAVASCRIPT_DEST = JAVASCRIPT_SRC.pathmap "build/%n.js"
+DEST = 'binder.min.js'
+
+task :default => [DEST]
+
+directory "build"
 
 COFFEE_DEST.each do |jsfile|
   srcfile = File.join('src', File.basename(jsfile).ext('.coffee'))
@@ -28,14 +30,14 @@ JAVASCRIPT_DEST.each do |jsfile|
   end
 end
 
-file 'binder.min.js' => COFFEE_DEST + JAVASCRIPT_DEST do |t|
+file DEST => COFFEE_DEST + JAVASCRIPT_DEST do |t|
   source = t.prerequisites.collect { |fn| File.read(fn) }
   source = source.join ' '
   File.write t.name, Uglifier.compile(source)
 end
 
 task :clean do
-  File.delete 'binder.min.js'
+  File.delete DEST
   FileUtils.rmdir 'build'
 end
 
@@ -44,4 +46,8 @@ task :watch do
     puts 'compiling'
     system 'rake'
   end
+end
+
+task :test => DEST do
+    system 'ichabod --jasmine SpecRunner.html'
 end

@@ -8,4 +8,5 @@ spec_files:
 helper_dir: .
 spec_dir: spec
 src_dir: .
+runner_output: ./runner.html
 

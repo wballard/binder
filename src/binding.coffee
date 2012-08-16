@@ -13,34 +13,6 @@ Ignore event handler, avoids making functions for each property
 ignore = ->
 
 ###
-@private
-
-This sets up a relay point to allow subscribe/unsubscribe functionality
-so that we can unhook data binding without unhooking other folks event
-handlers.
-
-This is a pub/sub setup rather than an event bubbling setup.
-
-###
-event_hub =
-
-    properties: {}
-
-    subscribe: (target, property) ->
-        @properties[property] = @properties[property] or []
-        if @properties[property].length is 0
-            #hook up the event relay when we get our very first one
-            $(event_hub).on "data-bind-#{property}", (evt, object, value) ->
-                for relay in @properties[property]
-                    relay.trigger "data-bind-#{property}.binder",
-                        [object, value]
-        @properties[property].push target
-
-    unsubscribe: (target, property) ->
-        @properties[property] = (@properties[property] or []).filter (x) ->
-            not(x.is target)
-
-###
 @function
 
 Given an object and a DOM element, bind them together.
@@ -57,16 +29,16 @@ databind = ($, object, element) ->
 
     #hook up a proxy to the object that translates the callback to
     #a jQuery event, proxyObject will only proxy just once, so this will
-    #set up events for any subsequente bindings to the same data
+    #so it is using events rather than direct method calls
     binder.proxyObject object, ignore,
         (object, property, value, options) ->
-            $(event_hub).trigger "data-bind-#{property}", [object, value]
+            $.pubsubhub("data-bind-#{property}").publish [object, value]
 
     #grab at any bindable under this element
     $('[data-bind]', $(element)).each (i, bindable) ->
         ( ->
             target = $(bindable)
-            property = target.data 'bind'
+            property = target.attr 'data-bind'
             #hold on to the source object as data, this is useful to know
             #which which object's attributes are being tracked
             target.data 'boundto.binder', object
@@ -79,17 +51,16 @@ databind = ($, object, element) ->
             else
                 #otherwise we just replace the body text
                 setWith = 'text'
-            event_hub.subscribe target, property
-            target.on "data-bind-#{property}.binder", (evt, object, value) ->
+            target.data 'boundto.callback', ([object, value]) ->
                 #data events are coming off by name, so look at the object
                 #as a bit of a double check to make sure we are getting the
                 #property for the correct object in case of name overloads
                 if target.data('boundto.binder') is object
                     target[setWith] value
-                    #and to be very jQuery link, fire an event to that any
+                    #and to be very jQuery like, fire an event to that any
                     #library user can override as they see fit in code
                     target.trigger 'datachange', [target[0], object, property, value]
-
+            $.pubsubhub("data-bind-#{property}").subscribe target.data('boundto.callback')
             #initial set of the value
             target[setWith] object[property]
         )()
@@ -110,12 +81,13 @@ unbind = ($, element) ->
         property = target.data 'bind'
         target.off '.binder'
         target.data 'boundto.binder', null
-        event_hub.unsubscribe target, property
+        $.pubsubhub("data-bind-#{property}").unsubscribe target.data('boundto.callback')
+        target.data 'boundto.callback', null
     element
 
 $ = jQuery
 ###
-jQuery plugin, this exports data binding
+jQuery plugin, this exports data binding.
 ###
 $.fn.extend
     binder: (data) ->

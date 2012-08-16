@@ -40,6 +40,7 @@ end
 Jasmine::Headless::Task.new('jasmine_headless') do |t|
     t.colors = true
     t.jasmine_config = 'jasmine.yaml'
+    t.keep_on_error = true
 end
 
 task :clean do
